@@ -9,13 +9,4 @@ if (!(Test-Path -Path $LogFolder )) {
 
 NetSh Advfirewall show allprofiles state | Out-File -encoding utf8 "$LogFile"
 
-# Get-WindowsUpdateLog -LogPath $LogFolder\WindowsUpdate.log
-
-# if ([System.IO.File]::Exists("$MonitoredLogFile")) {
-# 	Get-Content "$LogFolder\WindowsUpdate.log" | Set-Content -Path "$MonitoredLogFile"
-# }
-# else {
-# 	Copy-Item -Path "$LogFolder\WindowsUpdate.log" -Destination "$MonitoredLogFile"
-# }
-
 exit
