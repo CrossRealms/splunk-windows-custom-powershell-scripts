@@ -2,7 +2,6 @@
 
 Set-Variable -Name "LogFolder" -Value "$SplunkHome\var\log\windows_custom_powershell_scripts"
 Set-Variable -Name "LogFile" -Value "$SplunkHome\var\log\windows_custom_powershell_scripts\DefenderATP.log"
-Set-Variable -Name "ErrorFile" -Value "$SplunkHome\var\log\windows_custom_powershell_scripts\DefenderATPError.log"
 
 
 if (!(Test-Path -Path $LogFolder )) {
@@ -11,7 +10,7 @@ if (!(Test-Path -Path $LogFolder )) {
 
 
 # Checks if the registry value is present or not
-function Test-RegistryValue {
+function Get-RegistryValue {
     param (
         [parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]$Path,
@@ -19,18 +18,22 @@ function Test-RegistryValue {
         [ValidateNotNullOrEmpty()]$Value
     )
     try {
-        Get-ItemProperty -Path $Path -Name $Value -ErrorAction Stop | Out-Null
-    return $true
+		$Return = Get-ItemProperty -Path $Path | Select-Object -ExpandProperty $Value -ErrorAction Stop
+    	return $Return
     }
     catch {
-        return $false
+        return "NotFound"
     }
 }
 
 
+if (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status'){
+    $OnboardingState = Get-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status" -Value OnboardingState
+	
+	$LastConnected = Get-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status" -Value LastConnected
+	$LastConnected = [DateTime]::FromFiletimeUtc([Int64]::Parse($LastConnected))
 
-if (Test-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Advanced Threat Protection' -Value 'OnboardingInfo'){
-    "The defender ATP is installed." | Out-File -encoding utf8 "$LogFile"
+	"The defender ATP is installed. OnboardingState=" + $OnboardingState + ", LastConnected=" + $LastConnected + " UTC" | Out-File -encoding utf8 "$LogFile"
 }
 else{
     "The defender ATP is not installed." | Out-File -encoding utf8 "$LogFile"
