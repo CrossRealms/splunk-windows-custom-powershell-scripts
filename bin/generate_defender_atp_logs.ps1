@@ -42,7 +42,7 @@ if (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Statu
             try{
                 $LastConnected = Get-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status" -Value LastConnected
                 $LastConnected = [DateTime]::FromFiletimeUtc([Int64]::Parse($LastConnected))
-                $LastConnected = $LastConnected + " UTC"
+                $LastConnected = "" + $LastConnected + " UTC"
             }
             catch{
                 $LastConnected = " "
