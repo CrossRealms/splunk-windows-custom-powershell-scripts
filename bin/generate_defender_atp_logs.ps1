@@ -18,8 +18,11 @@ function Get-RegistryValue {
         [ValidateNotNullOrEmpty()]$Value
     )
     try {
-		$Return = Get-ItemProperty -Path $Path | Select-Object -ExpandProperty $Value -ErrorAction Stop
-    	return $Return
+        $Return = Get-ItemProperty -Path $Path | Select-Object -ExpandProperty $Value -ErrorAction Stop
+        if ($Return.Length -eq 0){
+			return "NotFound"
+		}
+        return $Return
     }
     catch {
         return "NotFound"
@@ -28,12 +31,29 @@ function Get-RegistryValue {
 
 
 if (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status'){
-    $OnboardingState = Get-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status" -Value OnboardingState
-	
-	$LastConnected = Get-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status" -Value LastConnected
-	$LastConnected = [DateTime]::FromFiletimeUtc([Int64]::Parse($LastConnected))
+    try{
+        $OnboardingState = Get-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status" -Value OnboardingState
 
-	"The defender ATP is installed. OnboardingState=" + $OnboardingState + ", LastConnected=" + $LastConnected + " UTC" | Out-File -encoding utf8 "$LogFile"
+        if ($OnboardingState -eq "NotFound"){
+            "The defender ATP is not installed." | Out-File -encoding utf8 "$LogFile"
+        }
+        else{
+            $LastConnected = " "
+            try{
+                $LastConnected = Get-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows Advanced Threat Protection\Status" -Value LastConnected
+                $LastConnected = [DateTime]::FromFiletimeUtc([Int64]::Parse($LastConnected))
+                $LastConnected = $LastConnected + " UTC"
+            }
+            catch{
+                $LastConnected = " "
+            }
+
+            "The defender ATP is installed. OnboardingState=" + $OnboardingState + ", LastConnected=" + $LastConnected | Out-File -encoding utf8 "$LogFile"
+        }
+    }
+    catch{
+        "The defender ATP is not installed." | Out-File -encoding utf8 "$LogFile"
+    }
 }
 else{
     "The defender ATP is not installed." | Out-File -encoding utf8 "$LogFile"
