@@ -5,7 +5,7 @@ Set-Variable -Name "LogFile" -Value "$SplunkHome\var\log\windows_custom_powershe
 
 
 if (!(Test-Path -Path $LogFolder )) {
-	New-Item -ItemType directory -Path $LogFolder
+    New-Item -ItemType directory -Path $LogFolder
 }
 
 
@@ -20,8 +20,8 @@ function Get-RegistryValue {
     try {
         $Return = Get-ItemProperty -Path $Path | Select-Object -ExpandProperty $Value -ErrorAction Stop
         if ($Return.Length -eq 0){
-			return "NotFound"
-		}
+            return "NotFound"
+        }
         return $Return
     }
     catch {
