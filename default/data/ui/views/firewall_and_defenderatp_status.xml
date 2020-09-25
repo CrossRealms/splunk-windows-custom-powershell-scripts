@@ -1,0 +1,39 @@
+<form>
+  <label>Firewall and DefenderATP Status</label>
+  <fieldset submitButton="false"></fieldset>
+  <row>
+    <panel>
+      <title>Firewall Statues</title>
+      <table>
+        <search>
+          <query>index=windows sourcetype="FirewallStatusLog" | dedup host | table host, Domain_Profile_Status, Private_Profile_Status, Public_Profile_Status</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Defender ATP Status</title>
+      <input type="dropdown" token="tkn_defender_atp_status">
+        <label>Defender ATP Status</label>
+        <choice value="Installed">Installed</choice>
+        <choice value="Not Installed">Not Installed</choice>
+        <default>Not Installed</default>
+      </input>
+      <table>
+        <search>
+          <query>index=windows sourcetype="DefenderATPLog" | dedup host | search status=$tkn_defender_atp_status|s$ | table host, status, OnboardingState, LastConnected</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>
