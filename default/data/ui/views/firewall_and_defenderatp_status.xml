@@ -6,9 +6,9 @@
       <title>Firewall Statues</title>
       <table>
         <search>
-          <query>index=windows sourcetype="FirewallStatusLog" | dedup host | table host, Domain_Profile_Status, Private_Profile_Status, Public_Profile_Status</query>
-          <earliest>0</earliest>
-          <latest></latest>
+          <query>index=windows sourcetype="FirewallStatusLog" | dedup host | table host, Domain_Profile_Status, Private_Profile_Status, Public_Profile_Status, _time</query>
+          <earliest>-4h@m</earliest>
+          <latest>now</latest>
           <sampleRatio>1</sampleRatio>
         </search>
         <option name="drilldown">none</option>
@@ -27,9 +27,9 @@
       </input>
       <table>
         <search>
-          <query>index=windows sourcetype="DefenderATPLog" | dedup host | search status=$tkn_defender_atp_status|s$ | table host, status, OnboardingState, LastConnected</query>
-          <earliest>0</earliest>
-          <latest></latest>
+          <query>index=windows sourcetype="DefenderATPLog" | dedup host | search status=$tkn_defender_atp_status|s$ | table host, status, OnboardingState, LastConnected, _time</query>
+          <earliest>-4h@m</earliest>
+          <latest>now</latest>
         </search>
         <option name="drilldown">none</option>
         <option name="refresh.display">progressbar</option>
